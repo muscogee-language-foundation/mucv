@@ -1,0 +1,8 @@
+# Local
+/target
+
+# Vars
+.env
+
+# Misc
+ngrok
