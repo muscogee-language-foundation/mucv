@@ -14,6 +14,7 @@ From Slack type `/mucv` and the above is what will be printed back to you in Sla
 - [x] Use command in chat and return date in muscogee 🎉
 - [ ] Add tests 😄
 - [ ] Get information about the Slack user and return a date relative to them as opposed to where the server is hosted 🙌
+- [ ] Allow the user to ask for nettv (day), hvse (month), and orolope (year) if they want. i.e.  `/mucv nettv` 💪
 
 ## References and Tools
 
