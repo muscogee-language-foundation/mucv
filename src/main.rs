@@ -1,6 +1,6 @@
 extern crate chrono;
 
-use actix_web::{http::header, post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, http::header, post, web, App, HttpResponse, HttpServer, Responder};
 use chrono::prelude::*;
 use dotenv::dotenv;
 use serde::{Deserialize, Serialize};
@@ -126,6 +126,11 @@ async fn mucv(_form: web::Form<FormData>) -> impl Responder {
         .json(response)
 }
 
+#[get("/test")]
+async fn test() -> impl Responder {
+    HttpResponse::Ok()
+}
+
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
@@ -135,7 +140,7 @@ async fn main() -> std::io::Result<()> {
 
     let host_and_port = format!("{}:{}", host, port);
 
-    HttpServer::new(|| App::new().service(mucv))
+    HttpServer::new(|| App::new().service(mucv).service(test))
         .bind(host_and_port)?
         .run()
         .await
