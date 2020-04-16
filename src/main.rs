@@ -128,8 +128,15 @@ async fn mucv(_form: web::Form<FormData>) -> impl Responder {
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
+    dotenv().ok();
+
+    let host = env::var("APP_HOST").unwrap_or("127.0.0.1".to_string());
+    let port = env::var("APP_PORT").unwrap_or(8080.to_string());
+
+    let host_and_port = format!("{}:{}", host, port);
+
     HttpServer::new(|| App::new().service(mucv))
-        .bind("127.0.0.1:8080")?
+        .bind(host_and_port)?
         .run()
         .await
 }
