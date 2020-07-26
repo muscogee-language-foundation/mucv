@@ -1,129 +1,56 @@
 extern crate chrono;
 
-use actix_web::{get, http::header, post, web, App, HttpResponse, HttpServer, Responder};
+mod models;
+mod utils;
+
+use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
 use chrono::prelude::*;
 use dotenv::dotenv;
-use serde::{Deserialize, Serialize};
+use models::FormData;
 use std::env;
-
-#[derive(Deserialize)]
-struct FormData {}
-
-#[derive(Serialize)]
-struct Response {
-    response_type: String,
-    text: String,
-}
-
-fn number_to_day_of_month(day: u32) -> String {
-    let days = [
-        "'svhvmkat",
-        "'svhokkolat",
-        "'svtuccēnat",
-        "'sostat",
-        "'svcahkepat",
-        "'svpakat",
-        "eskolvpakat",
-        "escenvpokakat",
-        "'sostvkakat",
-        "'svpalat",
-        "palen 'svhvmkat",
-        "palen 'svhokkolat",
-        "palen 'svtuccēnat",
-        "palen 'sostat",
-        "palen 'svcahkepat",
-        "palen 'svpakat",
-        "palen eskolvpakat",
-        "palen escenvpokakat",
-        "palen 'sostvkakat",
-        "pale 'svhokkolat",
-        "pale-hokkolen 'svhvmkat",
-        "pale-hokkolen 'svhokkolat",
-        "pale-hokkolen 'svtuccēnat",
-        "pale-hokkolen 'svostat",
-        "pale-hokkolen 'svcahkepat",
-        "pale-hokkolen 'svpakat",
-        "pale-hokkolen eskolvpakat",
-        "pale-hokkolen escenvpakat",
-        "pale-hokkolen 'sostvkakat",
-        "pale 'svtuccēnat",
-        "pale-tuccēnan 'svhvmkat",
-    ];
-
-    let result = *days.get(day as usize).unwrap();
-
-    result.to_string()
-}
-
-fn number_to_month(month: u32) -> String {
-    let months = [
-        "rvfocuse",
-        "hotvle hvse",
-        "tasacuce",
-        "tasace rakko",
-        "ke hvse",
-        "kvco hvse",
-        "hiyuce",
-        "hiyo rakko",
-        "otowoskuce",
-        "otowosko rakko",
-        "ehole",
-        "rvfo rakko",
-    ];
-
-    let result = *months.get(month as usize).unwrap();
-
-    result.to_string()
-}
-
-fn number_to_day_of_week(day: u32) -> String {
-    let days = [
-        "tacakuce",
-        "tvcakuce enhayvtke",
-        "mvnte enhayvtke",
-        "ennvrkvpv",
-        "ennvrkvpv enhayvtke",
-        "okkoskv nettv",
-        "tacakcuse",
-    ];
-
-    let result = *days.get(day as usize).unwrap();
-
-    result.to_string()
-}
+use utils::{number_to_day_of_month, number_to_day_of_week, number_to_month, respond};
 
 #[post("/")]
-async fn mucv(_form: web::Form<FormData>) -> impl Responder {
-    dotenv().ok();
-
+async fn mucv(form: web::Form<FormData>) -> impl Responder {
     let date = chrono::Utc::now();
 
     let month = date.month0();
     let day_of_month = date.day0();
     let day_of_week = date.weekday().num_days_from_sunday();
 
-    let date = format!(
-        "mucv nettv {} {} {} os",
-        number_to_day_of_week(day_of_week),
-        number_to_month(month),
-        number_to_day_of_month(day_of_month)
-    );
+    if form.text == "help" {
+        let response =
+            format!("Use this command by either typing /mucv, /mucv hvse, or /mucv nettv");
 
-    let response = Response {
-        response_type: "in_channel".to_string(),
-        text: date,
-    };
+        respond(response)
+    } else if form.text == "hvse" {
+        let month = format!("mucv hvse {}t os", number_to_month(month));
 
-    HttpResponse::Ok()
-        .header(
-            "Authorization",
-            format!(
-                "Bearer {}",
-                env::var("SLACK_TOKEN").expect("No slack token")
-            ),
-        )
-        .header(header::CONTENT_TYPE, "application/json")
-        .json(response)
+        respond(month)
+    } else if form.text == "nettv" {
+        let day = format!(
+            "mucv nettv {} {} os",
+            number_to_day_of_month(day_of_week),
+            number_to_day_of_month(day_of_month)
+        );
+
+        respond(day)
+    } else if form.text == "" {
+        let date = format!(
+            "mucv nettv {} {} {} os",
+            number_to_day_of_week(day_of_week),
+            number_to_month(month),
+            number_to_day_of_month(day_of_month)
+        );
+
+        respond(date)
+    } else {
+        let response = format!(
+            "We're sorry, we did not understand your command. Please try again using /mucv, /mucv hvse, or /mucv nettv"
+        );
+
+        respond(response)
+    }
 }
 
 #[get("/test")]
