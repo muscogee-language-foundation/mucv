@@ -29,7 +29,7 @@ async fn mucv(form: web::Form<FormData>) -> impl Responder {
     } else if form.text.eq_ignore_ascii_case("nettv") {
         let day = format!(
             "mucv nettv {} {} os",
-            number_to_day_of_month(day_of_week),
+            number_to_day_of_week(day_of_week),
             number_to_day_of_month(day_of_month)
         );
 
