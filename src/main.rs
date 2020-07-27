@@ -3,6 +3,7 @@ extern crate chrono;
 mod models;
 mod utils;
 
+use actix_web::middleware::Logger;
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
 use chrono::prelude::*;
 use dotenv::dotenv;
@@ -13,21 +14,19 @@ use utils::{number_to_day_of_month, number_to_day_of_week, number_to_month, resp
 #[post("/")]
 async fn mucv(form: web::Form<FormData>) -> impl Responder {
     let date = chrono::Utc::now();
-
     let month = date.month0();
     let day_of_month = date.day0();
     let day_of_week = date.weekday().num_days_from_sunday();
 
-    if form.text == "help" {
-        let response =
-            format!("Use this command by either typing /mucv, /mucv hvse, or /mucv nettv");
+    if form.text.eq_ignore_ascii_case("help") {
+        let res = format!("Use this command by either typing /mucv, /mucv hvse, or /mucv nettv");
 
-        respond(response)
-    } else if form.text == "hvse" {
+        respond(res)
+    } else if form.text.eq_ignore_ascii_case("hvse") {
         let month = format!("mucv hvse {}t os", number_to_month(month));
 
         respond(month)
-    } else if form.text == "nettv" {
+    } else if form.text.eq_ignore_ascii_case("nettv") {
         let day = format!(
             "mucv nettv {} {} os",
             number_to_day_of_month(day_of_week),
@@ -45,11 +44,11 @@ async fn mucv(form: web::Form<FormData>) -> impl Responder {
 
         respond(date)
     } else {
-        let response = format!(
+        let res = format!(
             "We're sorry, we did not understand your command. Please try again using /mucv, /mucv hvse, or /mucv nettv"
         );
 
-        respond(response)
+        respond(res)
     }
 }
 
@@ -62,13 +61,21 @@ async fn test() -> impl Responder {
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
 
+    std::env::set_var("RUST_LOG", "actix_web=info");
+    env_logger::init();
+
     let host = env::var("APP_HOST").unwrap_or("127.0.0.1".to_string());
     let port = env::var("APP_PORT").unwrap_or(8080.to_string());
 
     let host_and_port = format!("{}:{}", host, port);
 
-    HttpServer::new(|| App::new().service(mucv).service(test))
-        .bind(host_and_port)?
-        .run()
-        .await
+    HttpServer::new(|| {
+        App::new()
+            .wrap(Logger::default())
+            .service(mucv)
+            .service(test)
+    })
+    .bind(host_and_port)?
+    .run()
+    .await
 }

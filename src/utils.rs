@@ -2,21 +2,15 @@ use actix_web::{http::header, HttpResponse, Responder};
 use dotenv::dotenv;
 use std::env;
 
-use crate::models::{Response, Text};
+use crate::models::Response;
 
 pub fn respond(text: String) -> impl Responder {
     mk_respond(mk_response(text))
 }
 
 fn mk_response(text: String) -> Response {
-    let text = Text {
-        type_: "mrkdwn".to_string(),
-        text,
-    };
-
     let response = Response {
-        response_type: "ephemeral".to_string(),
-        replace_original: true,
+        response_type: "in_channel".to_string(),
         text,
     };
 

@@ -10,11 +10,14 @@ From Slack type `/mucv` and the above is what will be printed back to you in Sla
 
 ## Roadmap
 
-- [x] Get project up and working on digital ocean 🚀
-- [x] Use command in chat and return date in muscogee 🎉
-- [ ] Add tests 😄
-- [ ] Get information about the Slack user and return a date relative to them as opposed to where the server is hosted 🙌
-- [ ] Allow the user to ask for nettv (day), hvse (month), and orolope (year) if they want. i.e.  `/mucv nettv` 💪
+- [x] Get project up and working on digital ocean
+- [x] Use command in chat and return date in mvskoke
+- [x] Allow the user to ask for more specific time if they want (i.e. `/mucv nettv`):
+  - [x] nettv (day)
+  - [x] hvse (month)
+  - [ ] orolope (year)
+- [ ] Add tests
+- [ ] Get information about the Slack user and return a date relative to them as opposed to where the server is hosted
 
 ## References and Tools
 
