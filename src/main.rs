@@ -57,6 +57,22 @@ async fn test() -> impl Responder {
     HttpResponse::Ok()
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use actix_web::{test, App};
+
+    #[actix_rt::test]
+    async fn test_get() {
+        let mut app = test::init_service(App::new().service(test)).await;
+        let req = test::TestRequest::get().uri("/test").to_request();
+        let resp = test::call_service(&mut app, req).await;
+        assert!(resp.status().is_success());
+    }
+
+}
+
+
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
